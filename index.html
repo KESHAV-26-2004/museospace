@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MuseoSpace — Lobby</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&display=swap" rel="stylesheet">
+
+</head>
+<script>
+document.addEventListener("mousemove", (e) => {
+  const x = (window.innerWidth / 2 - e.clientX) / 80;
+  const y = (window.innerHeight / 2 - e.clientY) / 80;
+
+  // Left frame parallax
+  const left = document.querySelector(".frame-left");
+  left.style.transform = `rotate(-8deg) translate(${x}px, ${y}px)`;
+
+  // Right frame parallax
+  const right = document.querySelector(".frame-right");
+  right.style.transform = `rotate(8deg) translate(${-x}px, ${y}px)`;
+
+  // Statue parallax (small movement)
+  const statue = document.querySelector(".statue");
+  statue.style.transform = `translateX(-50%) translate(${x/2}px, ${y/2}px)`;
+
+  // Vase parallax
+  const vase = document.querySelector(".vase");
+  vase.style.transform = `translateX(-50%) translate(${-x/2}px, ${y/2}px)`;
+
+  // Cameraman slight parallax
+  const cam = document.querySelector(".cameraman");
+  cam.style.transform = `translate(${x/3}px, ${y/3}px)`;
+});
+</script>
+
+<body>
+  <div class="museum-container">
+  <div class="dust"></div>
+
+    <!-- LEFT FRAME (Vecteezy golden frame) -->
+    <div class="frame frame-left">
+  <img src="assets/vecteezy_vintage-picture-frame-luxury-photo-frame_24077617.png"
+       class="frame-img">
+
+  <div class="frame-image-container left-img">
+    <img src="assets/main-1.png" class="frame-photo">
+  </div>
+</div>
+
+
+
+    <!-- RIGHT FRAME (Floral golden frame) -->
+    <div class="frame frame-right">
+  <img src="assets/ai-generated-golden-rectangle-photo-frame-intertwined-with-roses-decorative-your-picture-with-floral-vintage-style-ai-generated-transparent-png.png"
+       alt="right-frame" class="frame-img">
+
+  <div class="frame-image-container">
+    <img src="assets/main-2.png" class="frame-photo">
+  </div>
+</div>
+
+
+    <!-- CENTER TITLE + BUTTONS -->
+    <div class="center-content">
+      <h2 class="subtitle">EXPLORING THE WORLD OF</h2>
+      <h1 class="title">MuseoSpace — Virtual Art Exhibition Experience</h1>
+      <div class="center-buttons">
+        <button class="main-btn" onclick="location.href='gallery.html'">Start Tour</button>
+      </div>
+    </div>
+
+    <!-- LEFT STATUE on pedestal -->
+    <div class="object-block statue-block">
+  <img src="assets/cracked-white-marble-pedestal-with-intricate-floral-carvings-and-classical-design-showing-signs-of-damage-and-wear-isolated-on-transparency-background-with-broken-pieces-at-base-png.png"
+       class="object-base">
+
+  <img src="assets/hand-drawn-female-garden-statue-watercolor-clipart-for-cottagecore-journaling-scrapbooking-wedding-cards-invitations-planners-and-crafting-projects-png.png"
+       class="object-top statue">
+</div>
+
+
+    <!-- RIGHT VASE on pedestal -->
+    <div class="object-block vase-block">
+  <img src="assets/cracked-white-marble-pedestal-with-intricate-floral-carvings-and-classical-design-showing-signs-of-damage-and-wear-isolated-on-transparency-background-with-broken-pieces-at-base-png.png"
+       class="object-base">
+
+  <img src="assets/isometric-vases-3d-render-png.png"
+       class="object-top vase">
+</div>
+
+
+    <!-- LEFT rope barriers (two pieces) -->
+    <div class="ropes left-ropes">
+      <img src="assets/gold-stanchion-red-velvet-rope-barrier-luxury-event-entrance-isolated-security-elegant-exclusive-used-for-crowd-control-at-formal-occasions-png.png"
+           class="rope" alt="rope1">
+      <img src="assets/gold-stanchion-red-velvet-rope-barrier-luxury-event-entrance-isolated-security-elegant-exclusive-used-for-crowd-control-at-formal-occasions-png.png"
+           class="rope" alt="rope2">
+    </div>
+
+    <!-- RIGHT rope barriers (two pieces) -->
+    <div class="ropes right-ropes">
+      <img src="assets/gold-stanchion-red-velvet-rope-barrier-luxury-event-entrance-isolated-security-elegant-exclusive-used-for-crowd-control-at-formal-occasions-png.png"
+           class="rope" alt="rope3">
+      <img src="assets/gold-stanchion-red-velvet-rope-barrier-luxury-event-entrance-isolated-security-elegant-exclusive-used-for-crowd-control-at-formal-occasions-png.png"
+           class="rope" alt="rope4">
+    </div>
+
+    <!-- CAMERAMAN (right side, looking left) -->
+    <img src="assets/a-man-in-a-hat-and-hat-crouches-down-with-a-camera-png.png"
+         class="cameraman" alt="cameraman">
+
+    <!-- WOODEN FLOOR at bottom -->
+    <div class="floor"></div>
+
+  </div>
+  
+</body>
+</html>

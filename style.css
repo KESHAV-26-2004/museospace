@@ -1,0 +1,694 @@
+/* Reset & base */
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: linear-gradient(#352822, #2b1f1b); /* dark museum wall */
+  font-family: "Georgia", serif;
+  color: #efe7da;
+  overflow-x: hidden;
+}
+.museum-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+}
+
+/* STATIC DUST EFFECT (PERFORMANCE SAFE) */
+.dust {
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:
+      radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px) 0 0/4px 4px,
+      radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px) 2px 2px/6px 6px;
+    animation: dustFloat 14s infinite linear;
+    opacity:0.68;
+    z-index:0;
+  }
+
+/* WOODEN FLOOR */
+.floor {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 20%;
+  background: linear-gradient(180deg, #70402b 0%, #4c281d 100%);
+  box-shadow: inset 0 20px 40px rgba(0,0,0,0.6);
+}
+
+/* FRAMES */
+.frame {
+  position: absolute;
+  width: 300px;
+  height: 380px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+/* FRAME PNG always above the photo */
+.frame-img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  z-index: 3;        /* Always top layer */
+  pointer-events: none;
+}
+
+/* Image container inside the frame */
+.frame-image-container {
+  position: absolute;
+  width: 65%;        /* tighter fit */
+  height: 58%;       /* prevents spill */
+  top: 21%;          /* pushes image correctly inside */
+  left: 50%;
+  transform: translateX(-50%);
+  overflow: hidden;  /* stops leakage */
+  border-radius: 6px;
+  z-index: 2;
+}
+
+/* The artwork image */
+.frame-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;        /* crops instead of stretching */
+  object-position: center;  /* no distortion */
+  z-index: 1;
+}
+
+/* LEFT & RIGHT FRAME POSITIONS */
+.frame-left {
+  top: 8%;
+  left: 2%;
+  --rot: -8deg;
+  transform: rotate(var(--rot));
+}
+
+.frame-right {
+  top: 8%;
+  right: 2%;
+  --rot: 8deg;
+  transform: rotate(var(--rot));
+}
+
+/* FIX: remove double rotation */
+.left-img,
+.right-img {
+  transform: translateX(-50%);
+  transform-origin: center;
+}
+
+/* Shake animation when hovering over frame */
+.frame:hover {
+  animation: frameShake 0.25s ease-in-out;
+}
+
+@keyframes frameShake {
+  0%   { transform: rotate(var(--rot)) translateX(0); }
+  25%  { transform: rotate(calc(var(--rot) + 2deg)) translateX(1px); }
+  50%  { transform: rotate(var(--rot)) translateX(-1px); }
+  75%  { transform: rotate(calc(var(--rot) - 2deg)) translateX(1px); }
+  100% { transform: rotate(var(--rot)) translateX(0); }
+}
+
+
+
+
+/* CENTER TITLE + BUTTONS */
+.center-content {
+  position: absolute;
+  top: 14%;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  z-index: 30;
+}
+
+/* ============================
+   RETRO MUSEUM TITLE STYLE
+   ============================ */
+.title {
+  font-family: "Cherry Bomb One", cursive;
+  font-size: 54px;
+  letter-spacing: 2px;
+  color: #f5e9d4;
+  text-shadow: 0 6px 18px rgba(0,0,0,0.45),
+               0 3px 3px rgba(0,0,0,0.4);
+  margin: 0;
+  transform: scale(1.05);
+}
+
+.subtitle {
+  font-family: "Georgia", serif;
+  font-size: 30px;
+  letter-spacing: 3px;
+  color: #e9dfd2;
+  opacity: 0.9;
+}
+
+.center-buttons {
+  margin-top: 80px !important; /* was 14px */
+}
+
+
+/* ============================
+   VINTAGE START BUTTON
+   ============================ */
+.main-btn {
+  padding: 12px 40px;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  background: linear-gradient(#5a3b2c, #3c2a21);
+  border: 3px solid #d8c3a5;
+  border-radius: 12px;
+  color: #f2e7d8;
+
+  box-shadow: 
+      inset 0 2px 4px rgba(255,255,255,0.2),
+      inset 0 -3px 5px rgba(0,0,0,0.3),
+      0 8px 14px rgba(0,0,0,0.5);
+
+  transition: 0.2s ease;
+}
+
+.main-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 
+      inset 0 2px 4px rgba(255,255,255,0.2),
+      inset 0 -2px 4px rgba(0,0,0,0.3),
+      0 14px 20px rgba(0,0,0,0.55);
+}
+
+.main-btn:active {
+  transform: translateY(0px);
+  box-shadow: 
+      inset 0 1px 2px rgba(0,0,0,0.4),
+      0 5px 10px rgba(0,0,0,0.4);
+}
+
+/* UNIVERSAL OBJECT BLOCK (for statue + vase) */
+.object-block {
+  position: absolute;
+  width: 260px;
+  height: 420px;       /* enough space for both parts */
+  text-align: center;
+  z-index: 20;
+}
+
+/* base is always at the bottom */
+.object-base {
+  position: absolute;
+  bottom: 0;
+  left: 2%;
+  width: 100%;
+}
+
+/* top object sits above the base */
+.object-top {
+  position: absolute;
+  bottom: 185px;       /* adjust this for perfect sit-on-base */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+}
+
+/* statue-specific tweak */
+.object-top.statue {
+  width: 260px;
+  bottom: 178px;
+}
+
+/* vase-specific tweak */
+.object-top.vase {
+  width: 200px;
+  bottom: 175px;
+  transform: translateX(-50%);
+}
+
+/* POSITION BLOCKS IN ROOM */
+.statue-block {
+  left: 4%;
+  bottom: 7%;
+}
+
+.vase-block {
+  right: 4%;
+  bottom: 7%;
+}
+
+/* ROPES (two left, two right) */
+.ropes {
+  position: absolute;
+  bottom: 1%;
+  display: flex;
+  gap: 60px;
+  align-items: flex-end;
+  z-index: 22;
+}
+.left-ropes { left: 1%;}
+.right-ropes { right: 1%; }
+.rope {
+  width: 400px;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+  transform-origin: bottom center;
+  transform: translateY(6px);
+}
+
+/* CAMERAMAN (bottom-right) */
+.cameraman {
+  position: absolute;
+  bottom: 2%;
+  right: 14%;
+  width: 280px;
+  z-index: 25;
+  /* The original image faces left — do not flip if already correct.
+     If you need to flip horizontally, use: transform: scaleX(-1); */
+  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.6));
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .title { font-size: 44px; }
+  .frame { width: 220px; height: 300px; }
+  .frame-placeholder { width: 72%; height: 60%; font-size: 14px; }
+  .statue-block .statue, .vase-block .vase { width: 110px; }
+  .cameraman { width: 160px; right: 6%; bottom: 16%; }
+  .spotlight { width: 420px; }
+}
+
+
+/* Floating Up/Down Animation (statue + vase) */
+@keyframes floatUpDown {
+  0% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-6px); }
+  100% { transform: translateX(-50%) translateY(0); }
+}
+
+.statue,
+.vase {
+  animation: floatUpDown 6s ease-in-out infinite;
+}
+
+/* Cameraman subtle breathing */
+@keyframes breathe {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+  100% { transform: translateY(0); }
+}
+
+.cameraman {
+  animation: breathe 5s ease-in-out infinite;
+}
+
+/*first end*/
+/*second start*/
+
+/* ====================================================
+   PAGE 2: Gallery — captions, glow, stagger, layout
+   ==================================================== */
+
+/* header (fixed) */
+.gallery-header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  text-align: center;
+  padding: 0px 0;
+  z-index: 40;
+  background: transparent;
+}
+
+.gallery-title {
+  font-family: "Cherry Bomb One", cursive;
+  font-size: 40px;
+  color: #f5e9d4;
+  margin: 0;
+}
+
+.gallery-subtitle {
+  font-family: Georgia, serif;
+  font-size: 16px;
+  color: #e9dfd2;
+  margin: 6px 0 0 0;
+  opacity: 0.9;
+}
+
+/* horizontal walls wrapper */
+.walls-wrapper {
+  display: flex;
+  width: 400vw;
+  height: 100vh;
+  transition: transform 0.8s cubic-bezier(.22,.9,.27,1);
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.wall {
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(#352822, #2b1f1b);
+  padding-top: 140px;  /* room for header */
+  padding-bottom: 100px; /* room for nav buttons */
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* frames grid: 3x2 landscape frames */
+.frames-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 420px);
+  grid-template-rows: repeat(2, 320px);
+  place-content: center;
+  row-gap: 20px;
+  column-gap: 40px;
+  margin: 0 auto;
+}
+
+/* frame card styling */
+.frame-card {
+  width: 420px;
+  height: 320px;
+  background: linear-gradient(#5a3b2c, #3c2a21);
+  border: 4px solid #d8c3a5;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+  transition: transform 300ms ease, filter 300ms ease, opacity 300ms ease;
+  transform-origin: center;
+}
+
+/* artwork image fills frame (cropped center) */
+.frame-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+/* caption (hidden until active) */
+.frame-caption {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  background: rgba(18, 12, 9, 0.78); /* dark warm plate */
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #efe7da;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 260ms ease, transform 260ms ease;
+  pointer-events: none;
+  font-family: Georgia, serif;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+/* caption text */
+.frame-caption h3 {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  color: #f5e9d4;
+  font-weight: 600;
+}
+
+.frame-caption p {
+  margin: 0 0 6px 0;
+  font-size: 13px;
+  opacity: 0.95;
+}
+
+.frame-caption span {
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+/* caption appears only on active frame (with 300ms delay) */
+.frame-card.active-frame .frame-caption {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.3s; /* 300ms delay before caption animates */
+}
+
+/* fallback class to make caption visible if JS used caption-visible */
+.frame-card.caption-visible .frame-caption {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* dim other frames while one is active */
+.dimmed {
+  opacity: 0.55 !important;
+  filter: saturate(0.6) blur(1px);
+}
+
+/* active frame tilt + scale + brighter */
+.active-frame {
+  transform: scale(1.04) rotate(1.5deg);
+  z-index: 60;
+  filter: brightness(1.12) contrast(1.06) saturate(1.25);
+  box-shadow: 0 28px 60px rgba(255,160,80,0.08);
+}
+
+/* radial spotlight glow behind active frame (A) - light orange cinematic warmth */
+.frame-card.active-frame::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 560px;   /* slightly larger than frame for soft spread */
+  height: 460px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(ellipse at center,
+      rgba(255, 167, 79, 0.22) 0%,
+      rgba(255, 147, 51, 0.12) 30%,
+      rgba(255, 120, 20, 0.06) 55%,
+      rgba(20,10,8,0) 100%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: -1;
+  filter: blur(12px);
+}
+
+/* wall active class for potential different background shading */
+.wall.wall-active {
+  /* subtle lift on activation if desired */
+}
+
+/* bottom navigation */
+.bottom-nav {
+  position: fixed;
+  bottom: 28px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 36px;
+  z-index: 80;
+  pointer-events: auto;
+}
+
+.nav-btn {
+  padding: 12px 36px;
+  border-radius: 12px;
+}
+
+/* responsive adjustments */
+@media (max-width: 1100px) {
+  .frames-grid {
+    grid-template-columns: repeat(2, 360px);
+    grid-template-rows: repeat(3, 280px);
+    column-gap: 30px;
+    row-gap: 18px;
+  }
+  .frame-card { width: 360px; height: 280px; }
+  .frame-card.active-frame::before { width: 500px; height: 380px; }
+}
+
+@media (max-width: 700px) {
+  /* mobile: single column vertical stack (fallback to simpler experience) */
+  .walls-wrapper { flex-direction: column; width: 100%; height: auto; }
+  .wall { width: 100%; height: auto; padding-top: 110px; padding-bottom: 60px; }
+  .frames-grid {
+    grid-template-columns: repeat(1, min(86vw, 420px));
+    grid-template-rows: none;
+    gap: 18px;
+    padding-bottom: 30px;
+  }
+  .frame-card { width: min(86vw, 420px); height: calc(min(86vw, 420px) * 0.75); }
+  .bottom-nav { position: static; margin: 20px 0 40px 0; }
+}
+
+/* ====== PAGE-2 NAVBAR (Anime-style, Pure CSS) ====== */
+
+.gallery-nav {
+  position: relative;
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  z-index: 50;
+}
+
+.nav-tab {
+  position: relative;
+  padding: 10px 22px;
+  font-family: "Georgia", serif;
+  font-size: 18px;
+  color: #f5e9d4;
+  cursor: pointer;
+  opacity: 0.75;
+  transition: 0.3s ease;
+  user-select: none;
+}
+
+.nav-tab:hover {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+.nav-active {
+  opacity: 1 !important;
+}
+
+.nav-active-bg {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 120px;
+  background: radial-gradient(
+    circle,
+    rgba(255,140,40,0.28) 0%,
+    rgba(255,130,20,0.20) 35%,
+    rgba(255,110,10,0.08) 65%,
+    rgba(0,0,0,0) 100%
+  );
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  z-index: -1;
+  opacity: 0;
+  transition: all 0.35s cubic-bezier(.22,.9,.27,1);
+}
+
+.nav-btn {
+  width: 45px;
+  height: 45px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.bottom-nav button,
+.frame-card,
+.nav-tab {
+  cursor: pointer;
+}
+
+.back-btn {
+  position: absolute;
+  top: 18px;
+  left: 22px;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text-decoration: none;
+  font-size: 20px;
+  font-weight: bold;
+  color: #f5e9d4;
+
+  background: linear-gradient(#5a3b2c, #3c2a21);
+  border: 3px solid #d8c3a5;
+  border-radius: 50%;
+  box-shadow:
+    inset 0 2px 4px rgba(255,255,255,0.2),
+    inset 0 -3px 5px rgba(0,0,0,0.35),
+    0 6px 14px rgba(0,0,0,0.55);
+
+  cursor: pointer;
+  transition: 0.25s ease;
+  z-index: 9999;
+}
+
+.back-btn:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 2px 4px rgba(255,255,255,0.25),
+    inset 0 -2px 4px rgba(0,0,0,0.3),
+    0 12px 22px rgba(0,0,0,0.55);
+}
+
+.back-btn:active {
+  transform: translateY(0);
+  box-shadow:
+    inset 0 1px 2px rgba(0,0,0,0.45),
+    0 6px 10px rgba(0,0,0,0.45);
+}
+
+.feedback-btn {
+  position: absolute;
+  top: 18px;
+  right: 22px;         /* back-btn is on left, feedback goes on right */
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text-decoration: none;
+  font-size: 20px;
+  font-weight: bold;
+  color: #f5e9d4;
+
+  background: linear-gradient(#5a3b2c, #3c2a21);
+  border: 3px solid #d8c3a5;
+  border-radius: 50%;
+  box-shadow:
+    inset 0 2px 4px rgba(255,255,255,0.2),
+    inset 0 -3px 5px rgba(0,0,0,0.35),
+    0 6px 14px rgba(0,0,0,0.55);
+
+  cursor: pointer;
+  transition: 0.25s ease;
+  z-index: 9999;
+}
+
+.feedback-btn:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 2px 4px rgba(255,255,255,0.25),
+    inset 0 -2px 4px rgba(0,0,0,0.3),
+    0 12px 22px rgba(0,0,0,0.55);
+}
+
+.feedback-btn:active {
+  transform: translateY(0);
+  box-shadow:
+    inset 0 1px 2px rgba(0,0,0,0.45),
+    0 6px 10px rgba(0,0,0,0.45);
+}
+
+
+
+
+/*second end*/
+/*third start*/
+
+
+
+
+/*third end*/
+/*fourth start*/
+

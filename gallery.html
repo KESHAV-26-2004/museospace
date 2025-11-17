@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MuseoSpace — Gallery Walkthrough</title>
+
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&display=swap" rel="stylesheet">
+
+  <!-- Load artworks array -->
+  <script src="data.js"></script>
+
+  <style>
+    /* Small UI tweaks for nav buttons */
+    .nav-btn {
+      width: 64px;
+      height: 64px;
+      padding: 0;
+      border-radius: 50%;
+      font-size: 22px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      line-height: 1;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.45);
+      transition: transform 0.18s ease, filter 0.18s ease, opacity 0.18s ease;
+    }
+    .nav-btn:hover { transform: translateY(-3px); }
+
+    .nav-btn.disabled {
+      opacity: 0.45;
+      filter: saturate(0.4) grayscale(0.3);
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- FIXED HEADER -->
+<header class="gallery-header">
+  <a href="index.html" class="back-btn" aria-label="Back to Lobby">←</a>
+  <!-- ★ FEEDBACK BUTTON RESTORED -->
+  <a href="feedback.html" class="feedback-btn">★</a>
+  <h1 class="gallery-title">Gallery Walkthrough</h1>
+
+  <div class="gallery-nav" id="galleryNav" style="margin-top:10px;">
+    <div class="nav-tab" data-wall="0">Renaissance</div>
+    <div class="nav-tab" data-wall="1">Abstract</div>
+    <div class="nav-tab" data-wall="2">Modern</div>
+    <div class="nav-tab" data-wall="3">Contemporary</div>
+    <div class="nav-active-bg" id="navActiveBg"></div>
+  </div>
+</header>
+
+
+<!-- WALLS WRAPPER (empty grids will be filled dynamically) -->
+<div class="walls-wrapper" id="wallsWrapper">
+
+  <section class="wall" id="wall-0"><div class="frames-grid" id="grid-0"></div></section>
+  <section class="wall" id="wall-1"><div class="frames-grid" id="grid-1"></div></section>
+  <section class="wall" id="wall-2"><div class="frames-grid" id="grid-2"></div></section>
+  <section class="wall" id="wall-3"><div class="frames-grid" id="grid-3"></div></section>
+
+</div>
+
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="main-btn nav-btn" id="prevWall"><span>←</span></button>
+  <button class="main-btn nav-btn" id="nextWall"><span>→</span></button>
+</div>
+
+
+<!-- ============== GALLERY GENERATION SCRIPT ============== -->
+<script>
+/* ==========================================================
+   1) Decide which wall each artwork belongs to based on ID
+========================================================== */
+function wallOf(id) {
+  if (id <= 6) return 0;      // Renaissance
+  if (id <= 12) return 1;     // Abstract
+  if (id <= 18) return 2;     // Modern
+  return 3;                   // Contemporary
+}
+
+/* ==========================================================
+   2) Build frame-card HTML dynamically
+========================================================== */
+function createCard(art) {
+  const card = document.createElement("div");
+  card.className = "frame-card";
+
+  const img = document.createElement("img");
+  img.src = art.img;
+  img.alt = art.title;
+  img.loading = "lazy";
+  img.onclick = () => window.location.href = `artwork.html?id=${art.id}`;
+
+  const cap = document.createElement("div");
+  cap.className = "frame-caption";
+  cap.innerHTML = `
+      <h3>${art.title}</h3>
+      <p>${art.artist}, ${art.year}</p>
+      <span>${art.shortNote}</span>
+  `;
+
+  card.appendChild(img);
+  card.appendChild(cap);
+
+  return card;
+}
+
+/* ==========================================================
+   3) Populate all 4 walls automatically
+========================================================== */
+function populateGallery() {
+  const grids = [
+    document.getElementById("grid-0"),
+    document.getElementById("grid-1"),
+    document.getElementById("grid-2"),
+    document.getElementById("grid-3"),
+  ];
+
+  artworks.forEach(art => {
+    const index = wallOf(art.id);
+    grids[index].appendChild(createCard(art));
+  });
+}
+
+/* Wait for DOM then build */
+document.addEventListener("DOMContentLoaded", populateGallery);
+</script>
+
+
+
+<!-- ============== EXISTING WALL LOGIC (unchanged) ============== -->
+<script>
+let currentWall = 0;
+const totalWalls = 4;
+
+const wrapper = document.getElementById("wallsWrapper");
+const walls = document.querySelectorAll(".wall");
+
+const leftBtn = document.getElementById("prevWall");
+const rightBtn = document.getElementById("nextWall");
+
+const navTabs = document.querySelectorAll(".nav-tab");
+const navBg = document.getElementById("navActiveBg");
+
+let isAnimating = false;
+let scrollReady = true;
+
+
+/* ENTER WALL ANIMATION */
+function enterWall(index) {
+  const wall = walls[index];
+  const cards = wall.querySelectorAll(".frame-card");
+
+  walls.forEach((w,i) => i!==index && w.classList.remove("wall-active"));
+  wall.classList.add("wall-active");
+
+  cards.forEach((card,i) => {
+    card.style.transition="transform 400ms ease, opacity 400ms ease";
+    card.style.opacity="0";
+    card.style.transform="translateY(12px)";
+    setTimeout(()=>{
+      card.style.opacity="1";
+      card.style.transform="translateY(0)";
+    }, i*80+120);
+  });
+}
+
+/* NAV TAB UPDATE */
+function updateNav(i){
+  navTabs.forEach(t=>t.classList.remove("nav-active"));
+  const tab = navTabs[i];
+  tab.classList.add("nav-active");
+
+  const r = tab.getBoundingClientRect();
+  const p = tab.parentElement.getBoundingClientRect();
+  navBg.style.width = r.width+"px";
+  navBg.style.left = (r.left - p.left)+"px";
+  navBg.style.opacity = 1;
+}
+
+/* UPDATE LEFT/RIGHT BUTTONS */
+function updateButtons() {
+  currentWall===0 ? leftBtn.classList.add("disabled") : leftBtn.classList.remove("disabled");
+  currentWall===totalWalls-1 ? rightBtn.classList.add("disabled") : rightBtn.classList.remove("disabled");
+}
+
+/* GO TO WALL */
+function goToWall(i){
+  if(i<0 || i>=totalWalls || isAnimating || i===currentWall) return;
+  isAnimating = true;
+  currentWall = i;
+
+  wrapper.style.transform = `translateX(-${i*100}vw)`;
+
+  enterWall(i);
+  updateNav(i);
+  updateButtons();
+
+  setTimeout(()=>isAnimating=false, 900);
+}
+
+/* BUTTON NAV */
+leftBtn.onclick = ()=>goToWall(currentWall-1);
+rightBtn.onclick = ()=>goToWall(currentWall+1);
+
+/* NAV TAB CLICKS */
+navTabs.forEach(tab=>{
+  tab.onclick = ()=>goToWall(Number(tab.dataset.wall));
+});
+
+/* WHEEL CONTROL */
+(function(){
+  function handler(e){
+    e.preventDefault();
+    if(isAnimating || !scrollReady) return;
+
+    scrollReady=false;
+    const d=e.deltaY;
+
+    if(Math.abs(d)<25){
+      setTimeout(()=>scrollReady=true,100);
+      return;
+    }
+
+    if(d>0) goToWall(Math.min(currentWall+1,totalWalls-1));
+    else    goToWall(Math.max(currentWall-1,0));
+
+    setTimeout(()=>scrollReady=true,900);
+  }
+
+  window.addEventListener("wheel", handler, {passive:false});
+})();
+
+/* HOVER SPOTLIGHT */
+document.addEventListener("mouseover", e=>{
+  if(!e.target.closest(".frame-card")) return;
+
+  const card = e.target.closest(".frame-card");
+  const all = document.querySelectorAll(".frame-card");
+
+  all.forEach(c=>c!==card && c.classList.add("dimmed"));
+  card.classList.add("active-frame");
+});
+document.addEventListener("mouseout", e=>{
+  const all = document.querySelectorAll(".frame-card");
+  all.forEach(c=>{
+    c.classList.remove("dimmed");
+    c.classList.remove("active-frame");
+  });
+});
+
+/* INITIAL LOAD */
+window.addEventListener("load", ()=>{
+  enterWall(0);
+  updateNav(0);
+  updateButtons();
+});
+</script>
+
+</body>
+</html>

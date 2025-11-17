@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MuseoSpace — Artwork Focus</title>
+
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&display=swap" rel="stylesheet">
+
+<style>
+/* PAGE BACKGROUND */
+body {
+  margin: 0;
+  background: linear-gradient(#352822, #2b1f1b);
+  font-family: Georgia, serif;
+  color: #efe7da;
+  overflow: hidden;
+}
+
+/* MAIN CANVAS */
+.artwork-canvas {
+  width: 80%;
+  height: 80vh;
+  background: rgba(32,22,18,0.75);
+  border: 3px solid #d8c3a5;
+  border-radius: 16px;
+  margin: 60px auto 0;
+  display: grid;
+  grid-template-columns: 60% 40%;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+  position: relative;
+  overflow: hidden;
+  animation: fadeIn 0.6s cubic-bezier(.22,.9,.27,1);
+}
+
+@keyframes fadeIn {
+  from {opacity:0; transform:scale(.96) translateY(20px);}
+  to   {opacity:1; transform:scale(1) translateY(0);}
+}
+
+/* CLOSE BUTTON */
+.close-btn {
+  position: absolute;
+  right: 18px;
+  top: 14px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid #d8c3a5;
+  background: linear-gradient(#5a3b2c, #3c2a21);
+  font-size: 22px;
+  cursor: pointer;
+  color: #efe7da;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.5);
+}
+
+/* LEFT INFO SIDE */
+.info-box {
+  padding: 64px;
+  overflow-y: auto;
+  animation: slideIn 0.6s ease forwards;
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+@keyframes slideIn {
+  to {opacity:1; transform: translateX(0);}
+}
+
+.info-box h1 {
+  font-family: "Cherry Bomb One";
+  font-size: 54px;
+  margin-bottom: 20px;
+}
+
+.info-box p {
+  margin: 4px 0;
+  font-size: 24px;
+  opacity: 0.9;
+}
+
+.curator-notes {
+  margin-top: 16px;
+  font-size: 20px;
+  line-height: 1.5;
+  opacity: 0.95;
+}
+
+/* RIGHT IMAGE SIDE */
+.art-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* RECTANGLE IMAGE FRAME */
+.art-rect {
+  width: 80%;
+  height: 80%;
+  border-radius: 12px;
+  border: 4px solid #d8c3a5;
+  overflow: hidden;
+  box-shadow: 0 18px 32px rgba(0,0,0,0.55);
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.art-rect:hover {
+  transform: scale(1.02);
+  filter: contrast(1.03);
+}
+
+.art-rect img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* BOTTOM NAV BUTTONS */
+.bottom-nav-buttons {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 14px;
+}
+
+.bottom-nav-buttons button {
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: 2px solid #d8c3a5;
+  background: linear-gradient(#5a3b2c,#3c2a21);
+  color: #efe7da;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.bottom-nav-buttons button:hover {
+  transform: translateY(-2px);
+}
+
+/* TOP LINE across canvas */
+.top-line {
+  position: absolute;
+  width:90%;
+  top: 30px;
+  left: 20px;
+  right: 70px; /* stops before the close button */
+  height: 2px;
+  background: #d8c3a5;
+  opacity: 0.9;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- === ARTWORK CANVAS === -->
+<div class="artwork-canvas">
+  <div class="top-line"></div>
+
+
+  <button class="close-btn" onclick="window.location.href='gallery.html'">×</button>
+
+  <!-- LEFT INFO -->
+  <div class="info-box">
+    <h1 id="title">Loading...</h1>
+    <p id="artist"></p>
+    <p id="year"></p>
+    <p id="medium"></p>
+
+    <div class="curator-notes" id="notes"></div>
+  </div>
+
+  <!-- RIGHT IMAGE -->
+  <div class="art-box">
+    <div class="art-rect">
+      <img id="artImage" src="">
+    </div>
+  </div>
+
+  <!-- NEW BOTTOM BUTTONS -->
+  <div class="bottom-nav-buttons">
+    <button onclick="prevArt()">← Prev</button>
+    <button onclick="nextArt()">Next →</button>
+  </div>
+
+</div>
+
+
+<!-- LOAD DATA -->
+<script src="data.js"></script>
+
+<script>
+let currentId = Number(new URLSearchParams(location.search).get("id")) || 1;
+
+/* LOAD ARTWORK */
+function loadArt(id){
+  const art = artworks.find(a => a.id === id);
+  if(!art) return;
+
+  document.getElementById("title").textContent = art.title;
+  document.getElementById("artist").textContent = "Artist: " + art.artist;
+  document.getElementById("year").textContent = "Year: " + art.year;
+  document.getElementById("medium").textContent = "Medium: " + art.medium;
+  document.getElementById("notes").textContent = art.curatorNotes;
+  document.getElementById("artImage").src = art.img;
+
+  currentId = id;
+}
+
+/* NEXT & PREV FUNCTIONS */
+function nextArt(){
+  let next = currentId + 1;
+  if(next > artworks.length) next = 1;
+  loadArt(next);
+}
+
+function prevArt(){
+  let prev = currentId - 1;
+  if(prev < 1) prev = artworks.length;
+  loadArt(prev);
+}
+
+/* INITIAL LOAD */
+loadArt(currentId);
+</script>
+
+</body>
+</html>

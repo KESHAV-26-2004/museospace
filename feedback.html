@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>MuseoSpace — Visitor Reflection</title>
+
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg-dark:#352822;
+    --bg-darker:#2b1f1b;
+    --gold:#d8c3a5;
+    --panel:#efe7da;
+    --panel-ink:#2c221b;
+
+    /* frame aperture offsets */
+    --aperture-x: 8%;
+    --aperture-y: 12%;
+    --aperture-w: calc(100% - (var(--aperture-x) * 2));
+    --aperture-h: calc(101% - (var(--aperture-y) * 2));
+  }
+
+  /* STOP SCROLLING */
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: Georgia, serif;
+    background: linear-gradient(180deg,var(--bg-dark),var(--bg-darker));
+    color: var(--panel-ink);
+  }
+
+  /* MAIN STAGE */
+  .feedback-stage{
+    height: 100vh;
+    width: 100vw;
+    padding-top: 20px;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    position:relative;
+    overflow:hidden;
+  }
+
+  /* ✨ DUST EFFECT */
+  .dust {
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:
+      radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px) 0 0/4px 4px,
+      radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px) 2px 2px/6px 6px;
+    animation: dustFloat 14s infinite linear;
+    opacity:0.68;
+    z-index:5;
+  }
+
+  @keyframes dustFloat {
+    from { background-position:0 0, 2px 2px; }
+    to   { background-position:60px 60px, 62px 62px; }
+  }
+
+  /* SIDE FRAMES */
+  .decor-wrap {
+    position:absolute;
+    width:240px;
+    height:300px;
+    top:20%;
+    z-index:20;
+    pointer-events:none;
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6));
+    transform-origin:center;
+    animation: floatWave 5s ease-in-out infinite;
+  }
+
+  .decor-wrap.left  { left:10px; --rot:-8deg; }
+  .decor-wrap.right { right:10px; --rot: 8deg; }
+
+  @keyframes floatWave {
+    0%   { transform: translateY(0) rotate(var(--rot)); }
+    50%  { transform: translateY(-12px) rotate(var(--rot)); }
+    100% { transform: translateY(0) rotate(var(--rot)); }
+  }
+
+  .decor-wrap:hover { animation: shake 0.35s ease-in-out; }
+
+  @keyframes shake {
+    0%   { transform: translateY(0) rotate(var(--rot)); }
+    25%  { transform: translateY(-3px) rotate(calc(var(--rot) + 1deg)); }
+    50%  { transform: translateY(2px) rotate(calc(var(--rot) - 1deg)); }
+    75%  { transform: translateY(-1px) rotate(calc(var(--rot) + 0.5deg)); }
+    100% { transform: translateY(0) rotate(var(--rot)); }
+  }
+
+  .decor-frame {
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    position:absolute;
+    left:0; top:0;
+    z-index:3;
+  }
+
+  .decor-inner {
+    position:absolute;
+    left: var(--aperture-x);
+    top: var(--aperture-y);
+    width: var(--aperture-w);
+    height: var(--aperture-h);
+    object-fit: cover;
+    object-position:center;
+    border-radius:4px;
+    z-index:1;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+
+  /* BIG FRAME */
+  .big-frame-wrap{
+    position: relative;
+    width: 60%;
+    height: 90%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transform: rotate(90deg);
+    z-index:20;
+  }
+
+  .frame-content {
+    position:absolute;
+    width:60%;
+    height:90%;
+    left:50%;
+    top:50%;
+    transform: translate(-50%, -50%) rotate(-90deg);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px 20px;
+  }
+
+  .big-frame-img{ width:100%; height:100%; object-fit:contain; }
+
+  /* PARCHMENT */
+  .parchment {
+    width:100%;
+    height:100%;
+    border-radius:10px;
+    border:3px solid rgba(216,195,165,0.95);
+    background:
+      linear-gradient(180deg, rgba(255,250,240,0.99), rgba(245,236,215,0.99)),
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 6px);
+    box-shadow:0 10px 30px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.35);
+    padding:26px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+
+  .parchment h1{
+    margin:0;
+    font-family:"Cherry Bomb One";
+    font-size:34px;
+    color:#3b2a20;
+    text-align:center;
+  }
+
+  .divider { height:2px; background:var(--gold); width:60%; margin:6px auto 10px auto; }
+
+  /* FORM INPUT */
+  .form { width:100%; display:flex; flex-direction:column; gap:10px; }
+
+  .form input,
+  .form textarea {
+    border-radius:8px;
+    border:2px solid rgba(216,195,165,0.95);
+    background: rgba(60,42,35,0.03);
+    padding:10px 12px;
+    font-size:14px;
+    color:#2b1f18;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.35);
+  }
+
+  .form textarea { min-height:100px; resize:vertical; }
+
+  /* RATING */
+  .rating-box { display:flex; gap:6px; }
+  .star { font-size:26px; color:#b8a68b; cursor:pointer; transition:0.2s; }
+  .star:hover, .star.active { color:#ffcc55; transform:scale(1.15); }
+
+  /* FAVORITE SELECT */
+  .fav-select {
+    border-radius: 8px;
+    border: 2px solid rgba(216,195,165,0.95);
+    background: rgba(60,42,35,0.03);
+    padding: 10px 12px;
+    font-size: 14px;
+    color: #2b1f18;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.35);
+  }
+
+  /* BUTTONS */
+  .actions {
+    display:flex;
+    gap:12px;
+    justify-content:center;
+    margin-top:10px;
+  }
+
+  .btn {
+    padding:9px 18px;
+    border-radius:8px;
+    border:3px solid var(--gold);
+    background: linear-gradient(#5a3b2c,#3c2a21);
+    color:#efe7da;
+    font-weight:700;
+    cursor:pointer;
+    box-shadow:0 8px 18px rgba(0,0,0,0.45);
+  }
+
+  /* BACK BUTTON */
+  .back-btn {
+    position: fixed;
+    top:18px;
+    left:18px;
+    z-index:40;
+    width:44px;
+    height:44px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    border:3px solid var(--gold);
+    background: linear-gradient(#5a3b2c,#3c2a21);
+    color:var(--panel);
+    text-decoration:none;
+    font-weight:700;
+  }
+
+  /* ROPES */
+  .rope-barrier {
+    position:absolute;
+    bottom:-110px;
+    width:600px;
+    opacity:0.9;
+    filter:drop-shadow(0 8px 12px rgba(0,0,0,0.6));
+  }
+  .rope-left { left:30px; }
+  .rope-right { right:20px; }
+
+  /* MODAL (OUTSIDE MAIN STAGE) */
+  .modal {
+    position:fixed;
+    inset:0;
+    background: rgba(0,0,0,0.6);
+    z-index:9999;
+    display:none;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .modal .box {
+    width:580px;
+    height:auto;
+    background: linear-gradient(#5a3b2c,#3c2a21);
+    padding:34px 32px;
+    border-radius:14px;
+    border:3px solid var(--gold);
+    color:var(--panel);
+    text-align:center;
+    box-shadow:0 24px 40px rgba(0,0,0,0.55);
+    animation:modalPop .4s ease;
+  }
+
+  @keyframes modalPop {
+    from { opacity:0; transform:scale(.85) translateY(20px); }
+    to   { opacity:1; transform:scale(1) translateY(0); }
+  }
+
+  #modalDetails {
+    margin:22px 0 22px;
+    font-size:18px;
+    line-height:1.55;
+    text-align:left;
+    background:rgba(0,0,0,0.25);
+    padding:24px;
+    border-radius:10px;
+    border:2px solid rgba(216,195,165,0.35);
+  }
+
+  .modal-buttons {
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:16px;
+  }
+
+  /* ENTRY ANIMATIONS */
+  .feedback-stage { opacity:0; transform:scale(0.96); filter:blur(4px); transition:500ms;}
+  .feedback-stage.loaded{ opacity:1; transform:scale(1); filter:blur(0);}
+  .big-frame-wrap{ opacity:0; transform:translateY(22px) scale(0.97) rotate(90deg); transition:400ms ease 0.2s;}
+  .big-frame-wrap.loaded{ opacity:1; transform:translateY(0) scale(1) rotate(90deg);}
+  .decor-wrap{ opacity:0; transition:600ms ease 0.25s; }
+  .decor-wrap.loaded{ opacity:1; }
+  .dust{ opacity:0; transition:600ms ease 0.2s; }
+  .dust.loaded{ opacity:0.68; }
+
+  /* TOAST */
+  #toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.75);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    display: none;
+    z-index: 99999;
+  }
+
+  #errorBox {
+    color:#b86a6a;
+    font-size:13px;
+    text-align:center;
+    display:none;
+  }
+
+</style>
+</head>
+<body>
+
+<a class="back-btn" href="gallery.html">←</a>
+
+<div class="feedback-stage">
+
+  <!-- DUST -->
+  <div class="dust"></div>
+
+  <!-- SIDE FRAMES -->
+  <div class="decor-wrap left">
+    <img src="assets/small-frame.png" class="decor-frame">
+    <img src="assets/img11.jpg" class="decor-inner">
+  </div>
+
+  <div class="decor-wrap right">
+    <img src="assets/small-frame.png" class="decor-frame">
+    <img src="assets/img12.jpg" class="decor-inner">
+  </div>
+
+  <!-- BIG FRAME -->
+  <div class="big-frame-wrap">
+    <div class="frame-content">
+      <div class="parchment">
+
+        <h1>Visitor Reflection</h1>
+        <div class="divider"></div>
+
+        <form id="feedbackForm" class="form">
+
+          <label for="name">Name</label>
+          <input id="name" name="name" type="text" placeholder="Your name" required>
+
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" placeholder="you@example.com" required>
+
+          <label for="comment">Your Thoughts</label>
+          <textarea id="comment" name="comment" placeholder="Share your experience..." required></textarea>
+
+          <label style="margin-top:10px;">Rate Your Experience</label>
+          <div class="rating-box">
+            <span class="star" data-val="1">★</span>
+            <span class="star" data-val="2">★</span>
+            <span class="star" data-val="3">★</span>
+            <span class="star" data-val="4">★</span>
+            <span class="star" data-val="5">★</span>
+          </div>
+          <input type="hidden" id="ratingValue">
+
+          <!-- FAVORITE ARTWORK -->
+          <label style="margin-top:10px;">Favorite Artwork</label>
+          <select id="favoriteArtwork" class="fav-select" required>
+            <option value="">— Select Artwork —</option>
+
+            <optgroup label="Renaissance">
+              <option>Madonna of the Golden Dawn</option>
+              <option>Portrait of a Courtly Noblewoman</option>
+              <option>Mona Lisa</option>
+              <option>Study for the Creation of Adam</option>
+              <option>Lady with an Ermine</option>
+              <option>The School of Athens</option>
+            </optgroup>
+
+            <optgroup label="Abstract">
+              <option>Composition VII</option>
+              <option>Broadway Boogie Woogie</option>
+              <option>Black Square</option>
+              <option>Improvisation 28</option>
+              <option>Composition with Red, Blue, and Yellow</option>
+              <option>Suprematist Composition</option>
+            </optgroup>
+
+            <optgroup label="Modern">
+              <option>The Starry Night</option>
+              <option>The Scream</option>
+              <option>The Persistence of Memory</option>
+              <option>Water Lilies</option>
+              <option>Girl with a Pearl Earring</option>
+              <option>Guernica</option>
+            </optgroup>
+
+            <optgroup label="Contemporary">
+              <option>Spiral Galaxy NGC Capture</option>
+              <option>Field of Atmospheric Echoes</option>
+              <option>Digital Waveform Study No. 3</option>
+              <option>City Lights: Nocturnal Reflections</option>
+              <option>Chromatic Horizon Study</option>
+              <option>Synthetic Bloom Sequence</option>
+            </optgroup>
+          </select>
+
+          <p id="errorBox"></p>
+
+          <div class="actions">
+            <button type="button" class="btn" id="cancelBtn">Cancel</button>
+            <button type="submit" class="btn" id="submitBtn">Submit</button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROPES -->
+  <img src="assets/gold-stanchion-red-velvet-rope-barrier-luxury-event-entrance-isolated-security-elegant-exclusive-used-for-crowd-control-at-formal-occasions-png.png" class="rope-barrier rope-left">
+  <img src="assets/gold-stanchion-red-velvet-rope-barrier-luxury-event-entrance-isolated-security-elegant-exclusive-used-for-crowd-control-at-formal-occasions-png.png" class="rope-barrier rope-right">
+</div>
+
+  <!-- MODAL NOW OUTSIDE THE FEEDBACK STAGE -->
+<div id="modal" class="modal">
+  <div class="box">
+    <h2 style="font-family:'Cherry Bomb One'; font-size:36px; margin:0;">Thank You</h2>
+    <p style="margin:6px 0 14px; font-size:24px; opacity:.9;">Your reflection has been recorded.</p>
+
+    <div id="modalDetails"></div>
+
+    <div class="modal-buttons">
+      <button id="restartBtn" class="btn">Restart Tour</button>
+      <button id="shareBtn" class="btn">Share Experience</button>
+      <button id="modalClose" class="btn">Close</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast">Your experience was shared! (simulation)</div>
+
+<script>
+/* FORM */
+const form = document.getElementById('feedbackForm');
+const modal = document.getElementById('modal');
+const modalClose = document.getElementById('modalClose');
+const cancelBtn = document.getElementById('cancelBtn');
+const stars = document.querySelectorAll(".star");
+const ratingValue = document.getElementById("ratingValue");
+const errorBox = document.getElementById("errorBox");
+const fav = document.getElementById("favoriteArtwork");
+
+const restartBtn = document.getElementById("restartBtn");
+const shareBtn = document.getElementById("shareBtn");
+const toast = document.getElementById("toast");
+
+/* STAR SELECTION */
+stars.forEach(star => {
+  star.addEventListener("click", () => {
+    const val = star.dataset.val;
+    ratingValue.value = val;
+
+    stars.forEach(s => s.classList.remove("active"));
+    for(let i=0; i<val; i++){
+      stars[i].classList.add("active");
+    }
+  });
+});
+
+/* VALIDATION */
+function validateForm() {
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const comment = document.getElementById("comment").value.trim();
+  const rating = ratingValue.value;
+  const favorite = fav.value;
+
+  if (name.length < 2) {
+    showError("Please enter your name.");
+    return false;
+  }
+  if (!/^\S+@\S+\.\S+$/.test(email)) {
+    showError("Enter a valid email address.");
+    return false;
+  }
+  if (comment.length < 5) {
+    showError("Your comment is too short.");
+    return false;
+  }
+  if (!rating) {
+    showError("Please select a star rating.");
+    return false;
+  }
+  if (favorite === "") {
+    showError("Select your favorite artwork.");
+    return false;
+  }
+
+  errorBox.style.display = "none";
+  return true;
+}
+
+function showError(msg) {
+  errorBox.textContent = msg;
+  errorBox.style.display = "block";
+}
+
+/* SUBMIT */
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  if (!validateForm()) return;
+
+  const name = document.getElementById("name").value.trim();
+  const rating = ratingValue.value;
+  const favorite = fav.value;
+  const comment = document.getElementById("comment").value.trim();
+
+  document.getElementById("modalDetails").innerHTML = `
+    <strong>Name:</strong> ${name}<br>
+    <strong>Rating:</strong> ${"★".repeat(rating)}<br>
+    <strong>Favorite Artwork:</strong> ${favorite}<br>
+    <strong>Your Reflection:</strong><br> ${comment}
+  `;
+
+  modal.style.display = 'flex';
+});
+
+/* MODAL ACTIONS */
+modalClose.addEventListener('click', () => modal.style.display='none');
+cancelBtn.addEventListener('click', () => form.reset());
+restartBtn.addEventListener('click', () => window.location.href = "index.html");
+
+shareBtn.addEventListener('click', () => {
+  toast.style.display = "block";
+  setTimeout(()=> toast.style.display="none", 2000);
+});
+
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape') modal.style.display='none';
+});
+</script>
+
+<script>
+window.addEventListener("load", () => {
+  document.querySelector(".feedback-stage").classList.add("loaded");
+  document.querySelector(".big-frame-wrap").classList.add("loaded");
+  document.querySelectorAll(".decor-wrap").forEach(el => el.classList.add("loaded"));
+  document.querySelector(".dust").classList.add("loaded");
+});
+</script>
+
+</body>
+</html>
