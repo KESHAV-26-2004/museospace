@@ -1,7 +1,15 @@
 # 🏛 MuseoSpace – Virtual Art Exhibition Experience
 
 <p align="left">
-<b>An Interactive Virtual Museum Built with Pure HTML, CSS, and JavaScript</b>
+An Interactive Virtual Museum Built with Pure HTML, CSS, and JavaScript
+</p>
+
+<p align="center">
+
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen)](https://keshav-26-2004.github.io/museospace/)
+![GitHub stars](https://img.shields.io/github/stars/KESHAV-26-2004/museospace)
+![GitHub forks](https://img.shields.io/github/forks/KESHAV-26-2004/museospace)
+
 </p>
 
 <p align="center">
@@ -14,6 +22,13 @@
 </p>
 
 ---
+
+A **virtual art exhibition platform** that recreates the experience of walking through a museum gallery directly in the browser.
+
+Users begin in a **museum lobby**, navigate through themed gallery walls, explore **artwork details with curator notes**, and leave a **visitor reflection** at the end of the tour.
+
+🔗 **Live Application:**  
+https://keshav-26-2004.github.io/museospace/
 
 # 📌 Overview
 
@@ -116,14 +131,6 @@ The UI includes multiple interactive effects:
 * Smooth page transitions
 
 These effects create a **cinematic museum atmosphere**.
-
----
-
-# 🌐 Live Demo
-
-🔗 **Visit MuseoSpace**
-
-[https://keshav-26-2004.github.io/museospace/](https://keshav-26-2004.github.io/museospace/)
 
 ---
 
